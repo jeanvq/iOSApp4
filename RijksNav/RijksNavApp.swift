@@ -1,17 +1,12 @@
-//
-//  RijksNavApp.swift
-//  RijksNav
-//
-//  Created by Jeancarlo on 2026-06-23.
-//
-
 import SwiftUI
 
+// MARK: - Punto de entrada principal de la app RijksNav
 @main
 struct RijksNavApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            // ArtListView es la vista raíz de la aplicación
+            ArtListView()
         }
     }
 }
