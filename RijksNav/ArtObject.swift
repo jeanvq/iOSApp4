@@ -1,56 +1,42 @@
 import Foundation
 
-// MARK: - Respuesta principal de la API del Art Institute of Chicago
+// MARK: - Respuesta de búsqueda del Met — devuelve lista de IDs
 struct SearchResponse: Codable {
-    let data: [ArtItem]
-    let pagination: Pagination
-}
-
-// MARK: - Información de paginación
-struct Pagination: Codable {
     let total: Int
-    let currentPage: Int
-    let totalPages: Int
-    
-    enum CodingKeys: String, CodingKey {
-        case total
-        case currentPage = "current_page"
-        case totalPages = "total_pages"
-    }
+    let objectIDs: [Int]?
 }
 
-// MARK: - Thumbnail con imagen en base64 de baja resolución
-struct Thumbnail: Codable {
-    let lqip: String?       // Imagen base64 de preview
-    let altText: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case lqip
-        case altText = "alt_text"
-    }
-}
-
-// MARK: - Representa una obra de arte individual del museo
+// MARK: - Representa una obra de arte individual del Met Museum
 struct ArtItem: Codable, Identifiable {
-    let id: Int
-    let title: String?
-    let artistDisplay: String?
-    let dateDisplay: String?
-    let placeOfOrigin: String?
-    let mediumDisplay: String?
-    let dimensions: String?
-    let imageId: String?
-    let thumbnail: Thumbnail?       // Contiene imagen base64 de preview
+    let id: Int                         // ID único (objectID)
+    let title: String?                  // Título de la obra
+    let artistDisplayName: String?      // Nombre del artista
+    let objectDate: String?             // Fecha de creación
+    let country: String?                // País de origen
+    let medium: String?                 // Material o técnica
+    let dimensions: String?             // Dimensiones
+    let primaryImageSmall: String?      // URL imagen pequeña
+    let primaryImage: String?           // URL imagen completa
+    let department: String?             // Departamento del museo
+    let objectURL: String?              // Link a la página del Met
+    
+    // MARK: - URL de imagen para mostrar en la app
+    var imageURL: URL? {
+        guard let urlString = primaryImageSmall, !urlString.isEmpty else { return nil }
+        return URL(string: urlString)
+    }
     
     enum CodingKeys: String, CodingKey {
-        case id
+        case id = "objectID"
         case title
-        case artistDisplay = "artist_display"
-        case dateDisplay = "date_display"
-        case placeOfOrigin = "place_of_origin"
-        case mediumDisplay = "medium_display"
+        case artistDisplayName
+        case objectDate
+        case country
+        case medium
         case dimensions
-        case imageId = "image_id"
-        case thumbnail
+        case primaryImageSmall
+        case primaryImage
+        case department
+        case objectURL
     }
 }

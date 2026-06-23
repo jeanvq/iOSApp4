@@ -1,55 +1,77 @@
 import SwiftUI
 
-// MARK: - Vista principal que muestra la lista de obras del Rijksmuseum
+// MARK: - Vista principal que muestra la lista de obras del Met Museum
 struct ArtListView: View {
     
-    // MARK: - ViewModel compartido con toda la app
     @StateObject private var viewModel = RijksViewModel()
     
     var body: some View {
         NavigationStack {
-            Group {
-                // MARK: - Estado de carga
-                if viewModel.isLoading {
-                    ProgressView("Cargando colección...")
+            ZStack {
+                // MARK: - Fondo oscuro
+                Color.black.ignoresSafeArea()
                 
-                // MARK: - Estado de error
-                } else if let error = viewModel.errorMessage {
-                    VStack(spacing: 16) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.largeTitle)
-                            .foregroundColor(.orange)
-                        Text(error)
-                            .multilineTextAlignment(.center)
-                        Button("Reintentar") {
-                            Task {
-                                await viewModel.fetchArtObjects()
+                Group {
+                    if viewModel.isLoading {
+                        VStack(spacing: 16) {
+                            ProgressView()
+                                .tint(.yellow)
+                                .scaleEffect(1.5)
+                            Text("Loading Content...")
+                                .foregroundColor(.gray)
+                                .font(.subheadline)
+                        }
+                        
+                    } else if let error = viewModel.errorMessage {
+                        VStack(spacing: 16) {
+                            Image(systemName: "exclamationmark.triangle")
+                                .font(.largeTitle)
+                                .foregroundColor(.yellow)
+                            Text(error)
+                                .foregroundColor(.gray)
+                                .multilineTextAlignment(.center)
+                            Button("Reintentar") {
+                                Task { await viewModel.fetchArtObjects(query: "impressionism") }
                             }
+                            .foregroundColor(.yellow)
                         }
-                    }
-                    .padding()
-                
-                // MARK: - Lista de obras
-                } else {
-                    List(viewModel.artItems) { item in
-                        NavigationLink(destination: ArtDetailView(item: item)) {
-                            ArtRowView(item: item)
-                        }
-                    }
-                    .searchable(text: $viewModel.searchText, prompt: "Buscar obras...")
-                    .onSubmit(of: .search) {
-                        Task {
-                            await viewModel.fetchArtObjects(query: viewModel.searchText)
+                        .padding()
+                        
+                    } else {
+                        // MARK: - Lista de obras
+                        ScrollView {
+                            LazyVStack(spacing: 12) {
+                                ForEach(viewModel.artItems) { item in
+                                    NavigationLink(destination: ArtDetailView(item: item)) {
+                                        ArtRowView(item: item)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.top, 8)
                         }
                     }
                 }
             }
-            .navigationTitle("Rijksmuseum")
+            .navigationTitle("The Met Museum")
             .navigationBarTitleDisplayMode(.large)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(Color.black, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(destination: FavoritesView(allItems: viewModel.artItems)) {                        Image(systemName: "heart.fill")
+                            .foregroundColor(.yellow)
+                    }
+                }
+            }
+            .searchable(text: $viewModel.searchText, prompt: "Search Paintings")
+            .onSubmit(of: .search) {
+                Task { await viewModel.fetchArtObjects(query: viewModel.searchText) }
+            }
         }
-        // MARK: - Carga inicial al aparecer la vista
         .task {
-            await viewModel.fetchArtObjects()
+            await viewModel.fetchArtObjects(query: "impressionism")
         }
     }
 }
