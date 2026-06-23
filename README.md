@@ -73,3 +73,13 @@ See [AIReflection.md](./AIReflection.md) for a full reflection on how AI tools w
 iOS Development — triOS College  
 [github.com/jeanvq](https://github.com/jeanvq)
 
+
+---
+
+## 📸 Screenshots
+
+<p float="left">
+  <img src="screenshots/app1.png" width="250"/>
+  <img src="screenshots/app2.png" width="250"/>
+  <img src="screenshots/app3.png" width="250"/>
+</p>
